@@ -1,0 +1,27 @@
+{
+  "taskdb": "mysql+taskdb://root:password@mysql:3306",
+  "projectdb": "mysql+projectdb://root:password@mysql:3306",
+  "resultdb": "mysql+resultdb://root:password@mysql:3306",
+  "message_queue": "amqp://pyspider:pyspider@rabbitmq:5672/%2F",
+  "phantomjs-proxy": "http://phantomjs:25555",
+
+  "phantomjs": {
+    "phantomjs-path": "phantomjs",
+    "port":25555,
+    "auto-restart": true
+  },
+
+  "fetcher": {
+    "xmlrpc": true,
+    "xmlrpc-host": "fetcher",
+    "xmlrpc-port": 24444
+  },
+
+  "webui": {
+    "username": "admin",
+    "password": "password",
+    "need-auth": true,
+    "scheduler-rpc": "http://scheduler:23333",
+    "fetcher-rpc": "http://fetcher:24444"
+  }
+}

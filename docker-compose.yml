@@ -1,0 +1,116 @@
+# based on https://github.com/binux/pyspider/blob/master/docker-compose.yaml
+version: "3.7"
+
+services:
+  rabbitmq:
+    image: rabbitmq:alpine
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: "pyspider"
+      RABBITMQ_DEFAULT_PASS: "pyspider"
+    networks:
+      - pyspider
+    command: rabbitmq-server
+
+  mysql:
+    image: mysql:5.6
+    container_name: mysql
+    environment:
+       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+       - MYSQL_ROOT_PASSWORD=password
+       - MYSQL_ROOT_HOST=%
+    networks:
+      - pyspider
+
+  phantomjs:
+    image: pyspider
+    container_name: phantomjs
+    networks:
+      - pyspider
+    volumes:
+      - ./config.json:/opt/pyspider/config.json
+      - ./data:/opt/pyspider/data
+    command: -c config.json phantomjs
+    depends_on:
+      - mysql
+      - rabbitmq
+    restart: unless-stopped
+
+  result:
+    image: pyspider
+    container_name: result
+    networks:
+      - pyspider
+    volumes:
+      - ./config.json:/opt/pyspider/config.json
+      - ./data:/opt/pyspider/data
+    command: -c config.json result_worker
+    depends_on:
+      - mysql
+      - rabbitmq
+    restart: unless-stopped # Sometimes we'll get a connection refused error because couchdb has yet to fully start
+
+  processor:
+    container_name: processor
+    image: pyspider
+    networks:
+      - pyspider
+    volumes:
+      - ./config.json:/opt/pyspider/config.json
+      - ./data:/opt/pyspider/data
+    command: -c config.json processor
+    depends_on:
+      - mysql
+      - rabbitmq
+    restart: unless-stopped
+
+  fetcher:
+    image: pyspider
+    container_name: fetcher
+    networks:
+      - pyspider
+    volumes:
+      - ./config.json:/opt/pyspider/config.json
+      - ./data:/opt/pyspider/data
+    command : -c config.json fetcher
+    depends_on:
+      - mysql
+      - rabbitmq
+    restart: unless-stopped
+
+  scheduler:
+    image: pyspider
+    container_name: scheduler
+    networks:
+      - pyspider
+    volumes:
+      - ./config.json:/opt/pyspider/config.json
+      - ./data:/opt/pyspider/data
+    command: -c config.json scheduler
+    depends_on:
+      - mysql
+      - rabbitmq
+    restart: unless-stopped
+
+  webui:
+    image: pyspider
+    container_name: webui
+    ports:
+      - "5050:5000"
+    networks:
+      - pyspider
+    volumes:
+      - ./config.json:/opt/pyspider/config.json
+      - ./data:/opt/pyspider/data
+    command: -c config.json webui
+    depends_on:
+      - mysql
+      - rabbitmq
+    restart: unless-stopped
+
+networks:
+  pyspider:
+    external:
+      name: pyspider
+  default:
+    driver: bridge
