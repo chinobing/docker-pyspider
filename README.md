@@ -10,7 +10,7 @@
 docker build -t "pyspider" .
 ```
 
-说明：其实这一步是多余，为什么要这么多此一举呢？　因为binux提供的默认docker image `binux/pyspider` 是基于python2.7制作的，导致了里面后续安装的库大部分情况下都会安装失败，非常蛋疼。所以我干脆就再自建一个。
+说明：其实这一步是多余，为什么要这么多此一举呢？　因为binux提供的默认docker image `binux/pyspider` 是基于python2.7制作的，导致了里面后续安装的库大部分情况下都会安装失败，非常蛋疼。所以干脆基于python3.6再建一个，这样确实避免很多麻烦。
 
 ## docker-compose up
 3、返回到根目录`docker-pyspider`
@@ -22,5 +22,11 @@ docker-compose up
 
 说明：这里的`docker-compose.yml`已经设置好加装`config.json`这个参数文件，主要用于设置登陆密码
 
+## 运行
+访问地址：http://localhost:5000/
+
+
 ## 最后
 pyspider生成的数据会记录到`data`这个外挂的文件夹当中，这样方便我们保存、调取数据。
+
+ps.这次操作是基于win10的WSL2下的docker完成
